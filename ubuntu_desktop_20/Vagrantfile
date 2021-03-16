@@ -27,10 +27,6 @@
     # Install needed stuff
     config.vm.provision :shell, inline: "sudo apt install -y git curl vim zsh mtr apt-transport-https ca-certificates gnupg-agent software-properties-common fonts-powerline" 
 
-    # Download repo
-    config.vm.provision :shell, inline: "git clone https://github.com/stefanfluit/bitwarden-hetzner.git /home/vagrant/bitwarden-hetzner"
-    config.vm.provision :shell, inline: "sudo chown vagrant:vagrant -R /home/vagrant/bitwarden-hetzner"
-
     # Configure ZSH
     config.vm.provision :shell, inline: "wget --no-check-certificate https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh"
     config.vm.provision :shell, inline: "sudo cp -r /root/.oh-my-zsh /home/vagrant/.oh-my-zsh"
