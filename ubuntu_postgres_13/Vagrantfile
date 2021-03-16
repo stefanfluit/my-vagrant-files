@@ -1,0 +1,44 @@
+  Vagrant.configure("2") do |config|
+    config.vm.box = "peru/ubuntu-20.04-server-amd64"
+    config.vm.box_version = "20210316.01"
+
+    config.vm.provider :virtualbox do |v|
+      v.gui = true
+      v.memory = 2048
+    end
+    # config.vm.provision :shell, inline: ""
+  
+    # Currently "ubuntu/bionic64" on VirtualBox requires `type: "virtualbox"`
+    # to make synced folder works.
+    config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+    # Force IPv4 on Apt
+    config.vm.provision :shell, inline: "sudo touch /etc/apt/apt.conf.d/99force-ipv4"
+    config.vm.provision :shell, inline: "sudo echo Acquire::ForceIPv4 \"true\"; >> /etc/apt/apt.conf.d/99force-ipv4"
+  
+    # Update repositories
+    config.vm.provision :shell, inline: "sudo apt-get update -y"
+  
+    # Upgrade installed packages
+    config.vm.provision :shell, inline: "sudo apt-get upgrade -y"
+  
+    # Add `vagrant` to Administrator
+    config.vm.provision :shell, inline: "sudo usermod -a -G sudo vagrant"
+
+    # Install needed stuff
+    config.vm.provision :shell, inline: "sudo apt-get install -y git wget curl vim zsh mtr apt-transport-https ca-certificates gnupg-agent software-properties-common fonts-powerline"
+
+    # Install PostgreSQL 13
+    config.vm.provision :shell, inline: "sudo echo \"deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main\" >> /etc/apt/sources.list.d/pgdg.list"
+    config.vm.provision :shell, inline: "wget https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+    config.vm.provision :shell, inline: "sudo apt-key add ACCC4CF8.asc"
+    config.vm.provision :shell, inline: "sudo apt-get update -y"
+    config.vm.provision :shell, inline: "sudo apt-get install -y postgresql-13"
+
+    # Configure ZSH
+    config.vm.provision :shell, inline: "wget --no-check-certificate https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh"
+    config.vm.provision :shell, inline: "sudo cp -r /root/.oh-my-zsh /home/vagrant/.oh-my-zsh"
+    config.vm.provision :shell, inline: "wget -O /home/vagrant/.zshrc https://raw.githubusercontent.com/stefanfluit/default_files/master/oh_my_zsh/.zshrc_vagrant"
+    config.vm.provision :shell, inline: "sudo chsh -s $(which zsh) vagrant"
+
+  end
